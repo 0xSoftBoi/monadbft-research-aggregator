@@ -1,207 +1,253 @@
-"""ArXiv paper scraper for MonadBFT and related consensus research."""
+"""ArXiv paper scraper for MonadBFT research papers."""
 
 import arxiv
-import logging
-from typing import List, Dict, Optional
-from datetime import datetime
-import PyPDF2
 import requests
 from pathlib import Path
-
-logger = logging.getLogger(__name__)
+from typing import List, Dict, Optional
+import json
+from datetime import datetime
+import PyPDF2
+import re
 
 
 class ArxivScraper:
-    """Scraper for MonadBFT papers from arXiv."""
-    
-    MONADBFT_ARXIV_ID = "2502.20692"
-    
-    RELATED_QUERIES = [
-        "MonadBFT",
-        "HotStuff consensus",
-        "Fast-HotStuff",
-        "Byzantine Fault Tolerance",
-        "streamlined consensus",
-        "responsive consensus",
-        "blockchain consensus latency",
-    ]
+    """Scraper for MonadBFT and related BFT consensus papers from arXiv."""
     
     def __init__(self, data_dir: str = "data/papers"):
-        """Initialize ArXiv scraper.
-        
-        Args:
-            data_dir: Directory to save downloaded papers
-        """
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
-        
-    def get_monadbft_paper(self) -> Dict:
-        """Fetch the main MonadBFT paper.
-        
-        Returns:
-            Dictionary with paper metadata and content
-        """
-        logger.info(f"Fetching MonadBFT paper: {self.MONADBFT_ARXIV_ID}")
-        
-        search = arxiv.Search(id_list=[self.MONADBFT_ARXIV_ID])
-        paper = next(search.results())
-        
-        paper_data = self._extract_paper_metadata(paper)
-        
-        # Download PDF
-        pdf_path = self.data_dir / f"monadbft_{self.MONADBFT_ARXIV_ID}.pdf"
-        paper.download_pdf(filename=str(pdf_path))
-        paper_data['local_path'] = str(pdf_path)
-        
-        # Extract text
-        paper_data['text'] = self._extract_pdf_text(pdf_path)
-        
-        logger.info(f"Successfully fetched MonadBFT paper")
-        return paper_data
+        self.metadata_file = self.data_dir / "metadata.json"
+        self.load_metadata()
     
-    def search_monadbft_papers(
-        self, 
-        max_results: int = 50,
-        categories: Optional[List[str]] = None
-    ) -> List[Dict]:
-        """Search for MonadBFT and related consensus papers.
+    def load_metadata(self):
+        """Load existing paper metadata."""
+        if self.metadata_file.exists():
+            with open(self.metadata_file, 'r') as f:
+                self.metadata = json.load(f)
+        else:
+            self.metadata = {"papers": []}
+    
+    def save_metadata(self):
+        """Save paper metadata."""
+        with open(self.metadata_file, 'w') as f:
+            json.dump(self.metadata, f, indent=2)
+    
+    def fetch_paper(self, arxiv_id: str) -> Dict:
+        """Fetch a specific paper by arXiv ID.
         
         Args:
-            max_results: Maximum number of results per query
-            categories: arXiv categories to search (default: cs.DC, cs.CR)
+            arxiv_id: ArXiv ID (e.g., '2502.20692')
             
         Returns:
-            List of paper metadata dictionaries
+            Dictionary with paper information
         """
-        if categories is None:
-            categories = ["cs.DC", "cs.CR"]  # Distributed Computing, Cryptography
+        print(f"Fetching paper {arxiv_id}...")
         
-        all_papers = []
-        seen_ids = set()
-        
-        for query in self.RELATED_QUERIES:
-            logger.info(f"Searching arXiv for: {query}")
-            
-            # Build search query with categories
-            cat_filter = " OR ".join([f"cat:{cat}" for cat in categories])
-            full_query = f"({query}) AND ({cat_filter})"
-            
-            search = arxiv.Search(
-                query=full_query,
-                max_results=max_results,
-                sort_by=arxiv.SortCriterion.SubmittedDate
-            )
-            
-            for paper in search.results():
-                if paper.entry_id not in seen_ids:
-                    paper_data = self._extract_paper_metadata(paper)
-                    all_papers.append(paper_data)
-                    seen_ids.add(paper.entry_id)
-        
-        logger.info(f"Found {len(all_papers)} unique papers")
-        return all_papers
-    
-    def search_by_authors(self, authors: List[str], max_results: int = 20) -> List[Dict]:
-        """Search papers by specific authors.
-        
-        Args:
-            authors: List of author names
-            max_results: Maximum results per author
-            
-        Returns:
-            List of paper metadata dictionaries
-        """
-        all_papers = []
-        seen_ids = set()
-        
-        for author in authors:
-            logger.info(f"Searching papers by: {author}")
-            
-            search = arxiv.Search(
-                query=f"au:{author}",
-                max_results=max_results,
-                sort_by=arxiv.SortCriterion.SubmittedDate
-            )
-            
-            for paper in search.results():
-                if paper.entry_id not in seen_ids:
-                    paper_data = self._extract_paper_metadata(paper)
-                    all_papers.append(paper_data)
-                    seen_ids.add(paper.entry_id)
-        
-        return all_papers
-    
-    def download_paper(self, arxiv_id: str, extract_text: bool = True) -> Dict:
-        """Download a specific paper by arXiv ID.
-        
-        Args:
-            arxiv_id: arXiv paper ID
-            extract_text: Whether to extract text from PDF
-            
-        Returns:
-            Paper metadata and content
-        """
+        # Search for paper
         search = arxiv.Search(id_list=[arxiv_id])
         paper = next(search.results())
         
-        paper_data = self._extract_paper_metadata(paper)
-        
         # Download PDF
-        pdf_path = self.data_dir / f"{arxiv_id.replace('/', '_')}.pdf"
+        pdf_path = self.data_dir / f"{arxiv_id.replace('.', '_')}.pdf"
         paper.download_pdf(filename=str(pdf_path))
-        paper_data['local_path'] = str(pdf_path)
         
-        if extract_text:
-            paper_data['text'] = self._extract_pdf_text(pdf_path)
+        # Extract metadata
+        paper_data = {
+            "arxiv_id": arxiv_id,
+            "title": paper.title,
+            "authors": [author.name for author in paper.authors],
+            "abstract": paper.summary,
+            "published": paper.published.isoformat(),
+            "updated": paper.updated.isoformat(),
+            "categories": paper.categories,
+            "pdf_path": str(pdf_path),
+            "pdf_url": paper.pdf_url,
+            "downloaded_at": datetime.now().isoformat()
+        }
         
+        # Extract text content
+        paper_data["content"] = self.extract_pdf_text(pdf_path)
+        
+        # Add to metadata
+        self.metadata["papers"].append(paper_data)
+        self.save_metadata()
+        
+        print(f"✓ Downloaded: {paper.title}")
         return paper_data
     
-    def _extract_paper_metadata(self, paper) -> Dict:
-        """Extract metadata from arXiv paper object."""
-        return {
-            'arxiv_id': paper.entry_id.split('/')[-1],
-            'title': paper.title,
-            'authors': [author.name for author in paper.authors],
-            'abstract': paper.summary,
-            'published': paper.published.isoformat(),
-            'updated': paper.updated.isoformat() if paper.updated else None,
-            'categories': paper.categories,
-            'primary_category': paper.primary_category,
-            'pdf_url': paper.pdf_url,
-            'doi': paper.doi,
-            'journal_ref': paper.journal_ref,
-            'source': 'arxiv',
-            'scraped_at': datetime.now().isoformat(),
-        }
+    def fetch_monadbft_paper(self) -> Dict:
+        """Fetch the main MonadBFT paper."""
+        return self.fetch_paper("2502.20692")
     
-    def _extract_pdf_text(self, pdf_path: Path) -> str:
-        """Extract text content from PDF."""
-        try:
-            text_parts = []
-            with open(pdf_path, 'rb') as f:
-                pdf_reader = PyPDF2.PdfReader(f)
-                for page in pdf_reader.pages:
-                    text_parts.append(page.extract_text())
-            return "\n\n".join(text_parts)
-        except Exception as e:
-            logger.error(f"Error extracting PDF text: {e}")
-            return ""
-    
-    def get_citations(self, arxiv_id: str) -> List[str]:
-        """Get citations from a paper (using references section).
+    def search_bft_papers(self, query: str = "BFT consensus", max_results: int = 50) -> List[Dict]:
+        """Search for BFT consensus papers.
         
         Args:
-            arxiv_id: arXiv paper ID
+            query: Search query
+            max_results: Maximum number of results
             
         Returns:
-            List of cited arXiv IDs found in references
+            List of paper dictionaries
         """
-        paper_data = self.download_paper(arxiv_id, extract_text=True)
-        text = paper_data.get('text', '')
+        print(f"Searching for: {query}...")
         
-        # Simple regex to find arXiv IDs in text
-        import re
-        arxiv_pattern = r'arXiv:(\d{4}\.\d{4,5})'
-        cited_ids = re.findall(arxiv_pattern, text)
+        search = arxiv.Search(
+            query=query,
+            max_results=max_results,
+            sort_by=arxiv.SortCriterion.Relevance
+        )
         
-        return list(set(cited_ids))
+        results = []
+        for paper in search.results():
+            paper_data = {
+                "arxiv_id": paper.entry_id.split('/')[-1],
+                "title": paper.title,
+                "authors": [author.name for author in paper.authors],
+                "abstract": paper.summary,
+                "published": paper.published.isoformat(),
+                "categories": paper.categories,
+                "pdf_url": paper.pdf_url
+            }
+            results.append(paper_data)
+            print(f"  - {paper.title}")
+        
+        return results
+    
+    def search_related_papers(self) -> List[Dict]:
+        """Search for papers related to MonadBFT."""
+        queries = [
+            "HotStuff consensus",
+            "Fast-HotStuff",
+            "BFT consensus blockchain",
+            "streamlined consensus",
+            "responsive BFT",
+            "blockchain finality"
+        ]
+        
+        all_results = []
+        for query in queries:
+            results = self.search_bft_papers(query, max_results=10)
+            all_results.extend(results)
+        
+        # Remove duplicates
+        seen = set()
+        unique_results = []
+        for paper in all_results:
+            if paper['arxiv_id'] not in seen:
+                seen.add(paper['arxiv_id'])
+                unique_results.append(paper)
+        
+        return unique_results
+    
+    def extract_pdf_text(self, pdf_path: Path) -> str:
+        """Extract text content from PDF.
+        
+        Args:
+            pdf_path: Path to PDF file
+            
+        Returns:
+            Extracted text content
+        """
+        try:
+            with open(pdf_path, 'rb') as f:
+                pdf_reader = PyPDF2.PdfReader(f)
+                text = ""
+                for page in pdf_reader.pages:
+                    text += page.extract_text() + "\n"
+                return text
+        except Exception as e:
+            print(f"Warning: Could not extract text from {pdf_path}: {e}")
+            return ""
+    
+    def extract_key_concepts(self, paper_data: Dict) -> Dict:
+        """Extract key concepts from paper.
+        
+        Args:
+            paper_data: Paper metadata with content
+            
+        Returns:
+            Dictionary of extracted concepts
+        """
+        content = paper_data.get("content", "") + " " + paper_data.get("abstract", "")
+        
+        concepts = {
+            "protocols": [],
+            "algorithms": [],
+            "metrics": [],
+            "challenges": []
+        }
+        
+        # Protocol patterns
+        protocol_patterns = [
+            r"\b(PBFT|HotStuff|Fast-HotStuff|MonadBFT|Tendermint|Raft)\b",
+            r"\b(\w+BFT)\b"
+        ]
+        
+        # Metric patterns
+        metric_patterns = [
+            r"(\d+\.?\d*)\s*(ms|milliseconds?|seconds?|TPS|transactions per second)",
+            r"(latency|throughput|finality|communication complexity)"
+        ]
+        
+        for pattern in protocol_patterns:
+            matches = re.findall(pattern, content, re.IGNORECASE)
+            concepts["protocols"].extend(matches)
+        
+        for pattern in metric_patterns:
+            matches = re.findall(pattern, content, re.IGNORECASE)
+            concepts["metrics"].extend(matches)
+        
+        # Remove duplicates
+        for key in concepts:
+            if isinstance(concepts[key], list):
+                concepts[key] = list(set(concepts[key]))
+        
+        return concepts
+    
+    def generate_summary(self, paper_data: Dict) -> str:
+        """Generate a summary of the paper.
+        
+        Args:
+            paper_data: Paper metadata
+            
+        Returns:
+            Formatted summary string
+        """
+        summary = f"""
+# {paper_data['title']}
+
+**Authors:** {', '.join(paper_data['authors'])}
+**Published:** {paper_data['published'][:10]}
+**arXiv ID:** {paper_data['arxiv_id']}
+
+## Abstract
+
+{paper_data['abstract']}
+
+## Key Concepts
+
+{json.dumps(self.extract_key_concepts(paper_data), indent=2)}
+
+## Links
+
+- [PDF]({paper_data['pdf_url']})
+- [arXiv Page](https://arxiv.org/abs/{paper_data['arxiv_id']})
+"""
+        return summary
+
+
+if __name__ == "__main__":
+    scraper = ArxivScraper()
+    
+    # Fetch MonadBFT paper
+    print("Fetching MonadBFT paper...")
+    monadbft = scraper.fetch_monadbft_paper()
+    
+    print("\n" + "="*80)
+    print(scraper.generate_summary(monadbft))
+    
+    # Search for related papers
+    print("\n" + "="*80)
+    print("\nSearching for related papers...")
+    related = scraper.search_related_papers()
+    print(f"\nFound {len(related)} related papers")
