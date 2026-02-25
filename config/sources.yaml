@@ -1,0 +1,86 @@
+# MonadBFT Research Sources Configuration
+
+# arXiv papers
+arxiv:
+  papers:
+    - "2502.20692"  # MonadBFT: Fast, Responsive, Fork-Resistant Streamlined Consensus
+  search_terms:
+    - "MonadBFT"
+    - "streamlined consensus"
+    - "Byzantine fault tolerance"
+    - "HotStuff"
+    - "Fast-HotStuff"
+    - "blockchain consensus"
+
+# GitHub repositories
+github:
+  repositories:
+    - "category-labs/monad-bft"
+    - "category-labs/monad"
+    - "category-labs/monad-viz"
+  organizations:
+    - "category-labs"
+  search_queries:
+    - "monadbft"
+    - "monad blockchain"
+
+# Blog sources
+blogs:
+  - url: "https://blog.monad.xyz"
+    name: "Category Labs Blog"
+    selectors:
+      title: "h1.post-title, h1.entry-title"
+      content: "div.post-content, article.post, div.entry-content"
+      date: "time.post-date, time.published"
+      author: "span.author, a.author-link"
+
+# Documentation sources
+documentation:
+  - url: "https://docs.monad.xyz"
+    name: "Official Monad Documentation"
+    crawl_depth: 3
+    include_patterns:
+      - "/consensus"
+      - "/architecture"
+      - "/protocol"
+      - "/developer"
+
+# Research databases
+research_databases:
+  - name: "Google Scholar"
+    search_terms:
+      - "MonadBFT"
+      - "Monad blockchain consensus"
+  - name: "IEEE Xplore"
+    search_terms:
+      - "streamlined Byzantine consensus"
+      - "blockchain finality"
+
+# Conference proceedings
+conferences:
+  - "SOSP"
+  - "OSDI"
+  - "NSDI"
+  - "PODC"
+  - "CCS"
+  - "Financial Cryptography"
+
+# Related protocols for comparison
+related_protocols:
+  - name: "HotStuff"
+    paper: "https://arxiv.org/abs/1803.05069"
+  - name: "Fast-HotStuff"
+    paper: "https://arxiv.org/abs/2010.11454"
+  - name: "Tendermint"
+    docs: "https://docs.tendermint.com"
+  - name: "Algorand"
+    docs: "https://developer.algorand.org"
+  - name: "Narwhal"
+    paper: "https://arxiv.org/abs/2105.11827"
+
+# Update frequency
+update_schedule:
+  arxiv: "daily"
+  github: "daily"
+  blogs: "weekly"
+  documentation: "weekly"
