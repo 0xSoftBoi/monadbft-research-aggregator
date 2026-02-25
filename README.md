@@ -1,44 +1,45 @@
 # MonadBFT Research Aggregator
 
-> Comprehensive research aggregation and implementation toolkit for MonadBFT consensus protocol
+<div align="center">
+  <h3>Comprehensive Research & Implementation Toolkit for MonadBFT Consensus</h3>
+  <p>Built for blockchain settlement research and Global Settlement architecture work</p>
+</div>
 
-## Overview
+## 🎯 Overview
 
-This toolkit provides a complete suite of tools for researching, implementing, and analyzing MonadBFT - a fast, responsive, and fork-resistant consensus protocol based on the HotStuff lineage. Built specifically for blockchain settlement research and Global Settlement's architecture work.
+This toolkit provides a complete suite of tools for researching, implementing, and analyzing MonadBFT consensus protocol. It aggregates research papers, provides implementation examples, benchmarks performance, and generates comprehensive documentation.
 
-## Features
+### Key Features
 
-### 1. Research Paper & Documentation Scraper
-- Automated scraping of MonadBFT papers from arXiv
-- Category Labs blog post aggregation
-- Official Monad documentation parser (docs.monad.xyz)
-- GitHub repository monitoring for category-labs/monad-bft
+1. **Research Paper & Documentation Scraper**
+   - arXiv paper aggregation (MonadBFT: Fast, Responsive, Fork-Resistant Streamlined Consensus)
+   - Category Labs blog post scraper
+   - Official Monad documentation parser
+   - GitHub implementation tracker
 
-### 2. Implementation Examples
-- BFT consensus simulation based on Fast-HotStuff
-- Tail-forking prevention demonstrations
-- Speculative finality examples
-- Network partition recovery scenarios
+2. **Implementation Examples**
+   - BFT consensus simulation based on Fast-HotStuff/HotStuff lineage
+   - Tail-forking prevention demonstrations
+   - Speculative finality examples
+   - Leader rotation and view-change simulations
 
-### 3. Performance Benchmarking
-- Consensus latency measurement
-- Throughput testing under various loads
-- Fork resistance analysis
-- Network overhead profiling
+3. **Performance Benchmarking**
+   - Consensus latency measurement
+   - Throughput analysis
+   - Fork resistance testing
+   - Network partition simulation
 
-### 4. Code Analysis Framework
-- MonadBFT implementation analyzer
-- Protocol correctness verification
-- Performance bottleneck detection
-- Consensus safety property validation
+4. **Code Analysis Framework**
+   - MonadBFT implementation analyzer
+   - Security property verification
+   - Liveness and safety checkers
 
-### 5. Documentation Generator
-- Automated research summaries
-- Implementation guides
-- Performance reports
-- Comparison with other BFT protocols
+5. **Documentation Generator**
+   - Research summary generation
+   - Implementation guides
+   - Performance reports
 
-## Installation
+## 🚀 Quick Start
 
 ```bash
 # Clone the repository
@@ -48,207 +49,396 @@ cd monadbft-research-aggregator
 # Install dependencies
 pip install -r requirements.txt
 
-# Install Node.js dependencies for visualization
-cd visualization
-npm install
+# Run research aggregator
+python src/research_scraper.py --sources all
+
+# Run BFT consensus simulation
+python src/implementations/bft_consensus_sim.py
+
+# Run benchmarks
+python src/benchmarks/consensus_benchmark.py
+
+# Analyze existing implementations
+python src/analysis/code_analyzer.py --repo category-labs/monad-bft
+
+# Generate documentation
+python src/documentation/doc_generator.py --output reports/
 ```
 
-## Quick Start
+## 📚 MonadBFT Key Concepts
 
-### Scraping Research Papers
+### Core Innovations
 
-```python
-from scrapers.arxiv_scraper import ArxivScraper
-from scrapers.blog_scraper import CategoryLabsScraper
+**1. Streamlined Communication**
+- Linear communication complexity O(n) instead of quadratic O(n²)
+- Validators only communicate with current leader
+- Leader aggregates votes and broadcasts certificates
 
-# Scrape MonadBFT paper
-arxiv = ArxivScraper()
-paper = arxiv.fetch_paper('2502.20692')
+**2. Tail-Forking Prevention**
+- Validators lock on proposed blocks during voting
+- Prevents malicious leaders from creating competing forks
+- Maintains responsiveness even with Byzantine leaders
 
-# Scrape blog posts
-blog = CategoryLabsScraper()
-posts = blog.fetch_all_posts()
+**3. Speculative Finality**
+- Blocks can be optimistically confirmed in one round
+- Falls back to two-round confirmation when needed
+- Adaptive to network conditions
+
+**4. View-Change Mechanism**
+- Efficient leader rotation on timeout
+- Byzantine fault tolerant up to f < n/3 failures
+- Fast recovery from network partitions
+
+### Architecture Components
+
+```
+MonadBFT Node Architecture:
+┌─────────────────────────────────────┐
+│  Application Layer                  │
+├─────────────────────────────────────┤
+│  Consensus Engine (MonadBFT)       │
+│  ├── Proposal Phase                 │
+│  ├── Voting Phase                   │
+│  ├── Commit Phase                   │
+│  └── View-Change Handler            │
+├─────────────────────────────────────┤
+│  P2P Network Layer                  │
+│  ├── Gossip Protocol                │
+│  ├── Message Authentication         │
+│  └── Network Partition Detection    │
+├─────────────────────────────────────┤
+│  Storage Layer                      │
+│  ├── Block Store                    │
+│  ├── Vote Store                     │
+│  └── Certificate Store              │
+└─────────────────────────────────────┘
 ```
 
-### Running BFT Simulation
-
-```python
-from simulations.bft_consensus import MonadBFTSimulator
-
-# Create simulator with 10 nodes, 3 Byzantine
-sim = MonadBFTSimulator(num_nodes=10, byzantine_nodes=3)
-sim.run_simulation(num_rounds=100)
-sim.generate_report()
-```
-
-### Benchmarking Performance
-
-```python
-from benchmarks.consensus_benchmark import ConsensusBenchmark
-
-bench = ConsensusBenchmark()
-results = bench.run_full_suite(
-    protocols=['MonadBFT', 'HotStuff', 'Tendermint'],
-    network_conditions=['ideal', 'high_latency', 'partition']
-)
-bench.generate_comparison_report(results)
-```
-
-## Project Structure
+## 📖 Project Structure
 
 ```
 monadbft-research-aggregator/
-├── scrapers/              # Research paper and documentation scrapers
-│   ├── arxiv_scraper.py
-│   ├── blog_scraper.py
-│   ├── github_scraper.py
-│   └── docs_scraper.py
-├── simulations/           # BFT consensus simulations
-│   ├── bft_consensus.py
-│   ├── tail_forking.py
-│   ├── speculative_finality.py
-│   └── network_models.py
-├── benchmarks/            # Performance benchmarking tools
-│   ├── consensus_benchmark.py
-│   ├── latency_test.py
-│   ├── throughput_test.py
-│   └── fork_resistance.py
-├── analysis/              # Code analysis framework
-│   ├── implementation_analyzer.py
-│   ├── safety_checker.py
-│   └── performance_profiler.py
-├── documentation/          # Documentation generator
-│   ├── generator.py
-│   ├── templates/
-│   └── reports/
-├── visualization/         # Interactive visualizations
-│   ├── consensus_viz.js
-│   └── monad-viz-demo/
-├── data/                  # Collected research data
-├── tests/                 # Comprehensive test suite
-└── examples/              # Usage examples
-
+├── src/
+│   ├── research_scraper.py          # Main research aggregation tool
+│   ├── implementations/
+│   │   ├── bft_consensus_sim.py     # BFT consensus simulation
+│   │   ├── tail_fork_prevention.py  # Tail-forking prevention demo
+│   │   ├── speculative_finality.py  # Speculative finality example
+│   │   └── leader_rotation.py       # View-change simulation
+│   ├── benchmarks/
+│   │   ├── consensus_benchmark.py   # Consensus performance tests
+│   │   ├── latency_analyzer.py      # Latency measurement
+│   │   ├── throughput_test.py       # Throughput analysis
+│   │   └── fork_resistance.py       # Fork resistance testing
+│   ├── analysis/
+│   │   ├── code_analyzer.py         # Implementation analyzer
+│   │   ├── safety_checker.py        # Safety property verification
+│   │   └── liveness_checker.py      # Liveness verification
+│   ├── documentation/
+│   │   ├── doc_generator.py         # Documentation generator
+│   │   └── report_templates/        # Report templates
+│   └── utils/
+│       ├── arxiv_client.py          # arXiv API client
+│       ├── github_client.py         # GitHub API client
+│       └── data_parser.py           # Data parsing utilities
+├── data/
+│   ├── papers/                      # Downloaded research papers
+│   ├── docs/                        # Scraped documentation
+│   └── implementations/             # Implementation code samples
+├── reports/                         # Generated reports
+├── tests/                          # Unit tests
+├── config/
+│   └── sources.yaml                # Source configuration
+├── requirements.txt                # Python dependencies
+└── README.md                       # This file
 ```
 
-## Key Concepts
+## 🔬 Research Sources
 
-### MonadBFT Protocol
+### Primary Sources
 
-MonadBFT is a streamlined BFT consensus protocol that achieves:
-- **Fast finality**: Sub-second transaction finality
-- **Responsive**: Leader-driven with responsive view changes
-- **Fork-resistant**: Tail-forking prevention mechanisms
-- **High throughput**: Optimized for settlement layer requirements
+1. **arXiv Paper**: [MonadBFT: Fast, Responsive, Fork-Resistant Streamlined Consensus (arXiv:2502.20692)](https://arxiv.org/abs/2502.20692)
+   - Core protocol specification
+   - Theoretical proofs of safety and liveness
+   - Performance analysis
 
-### Implementation Lineage
+2. **Category Labs Blog**
+   - Technical deep-dives
+   - Implementation notes
+   - monad-viz demonstration
 
-MonadBFT builds on the HotStuff lineage:
-```
-PBFT → HotStuff → Fast-HotStuff → MonadBFT
-```
+3. **Official Documentation**: [docs.monad.xyz](https://docs.monad.xyz)
+   - Protocol specifications
+   - Integration guides
+   - API documentation
 
-Key improvements:
-- Streamlined voting phases
-- Optimistic responsiveness
-- Enhanced fork resistance
-- Reduced message complexity
+4. **GitHub Implementations**: [category-labs/monad-bft](https://github.com/category-labs/monad-bft)
+   - Reference implementations
+   - Code examples
+   - Test suites
 
-## Usage Examples
+## 🛠️ Implementation Examples
 
-### Example 1: Comprehensive Research Collection
+### BFT Consensus Simulation
 
 ```python
-from aggregator import ResearchAggregator
+from src.implementations.bft_consensus_sim import MonadBFTSimulator
 
-agg = ResearchAggregator()
-agg.collect_all_sources()
-agg.generate_summary_report('monadbft_research_2026.pdf')
+# Create a network with 4 validators
+sim = MonadBFTSimulator(num_validators=4, byzantine_count=1)
+
+# Propose and commit blocks
+for i in range(10):
+    block = sim.propose_block(f"Block {i}")
+    result = sim.run_consensus(block)
+    print(f"Block {i}: {result.status} in {result.rounds} rounds")
+
+# Generate performance report
+sim.generate_report("simulation_results.json")
 ```
 
-### Example 2: Tail-Forking Prevention Demo
+### Tail-Forking Prevention
 
 ```python
-from simulations.tail_forking import TailForkingDemo
+from src.implementations.tail_fork_prevention import TailForkDemo
 
-demo = TailForkingDemo()
-demo.simulate_attack_scenario()
-demo.demonstrate_prevention()
-demo.visualize_results()
+# Demonstrate tail-forking prevention
+demo = TailForkDemo()
+
+# Scenario: Byzantine leader attempts to create fork
+result = demo.simulate_byzantine_leader_attack()
+print(f"Fork prevented: {result.fork_prevented}")
+print(f"Honest validators locked: {result.locked_count}")
 ```
 
-### Example 3: Settlement Layer Benchmark
+## 📊 Performance Benchmarking
+
+### Consensus Latency
 
 ```python
-from benchmarks.settlement_benchmark import SettlementBenchmark
+from src.benchmarks.consensus_benchmark import LatencyBenchmark
 
-bench = SettlementBenchmark()
-results = bench.test_settlement_finality(
-    transaction_rate=10000,  # 10k TPS
-    network_latency_ms=50,
-    byzantine_ratio=0.33
+bench = LatencyBenchmark()
+results = bench.run(
+    validator_counts=[4, 10, 25, 50, 100],
+    block_sizes=[1024, 10240, 102400],
+    network_delays=[10, 50, 100]  # milliseconds
 )
-print(f"Average finality time: {results.avg_finality_ms}ms")
+
+bench.plot_results("latency_comparison.png")
 ```
 
-## Research Sources
+### Throughput Analysis
 
-### Primary Paper
-- **MonadBFT: Fast, Responsive, Fork-Resistant Streamlined Consensus**
-  - arXiv:2502.20692
-  - Authors: Category Labs research team
-  - Focus: Settlement layer consensus optimization
+```python
+from src.benchmarks.throughput_test import ThroughputTest
 
-### Additional Resources
-- Category Labs blog: https://blog.monad.xyz
-- Official docs: https://docs.monad.xyz
-- GitHub: https://github.com/category-labs/monad-bft
-- Monad-viz interactive demo
+test = ThroughputTest()
+results = test.measure_tps(
+    duration=60,  # seconds
+    validator_count=10,
+    concurrent_proposals=True
+)
 
-## Performance Benchmarks
-
-### Typical Results (10 node network)
-
-| Metric | MonadBFT | HotStuff | Tendermint |
-|--------|----------|----------|------------|
-| Finality Time | 400ms | 600ms | 1000ms |
-| Throughput | 100k TPS | 80k TPS | 40k TPS |
-| Fork Events | 0.001% | 0.01% | 0.005% |
-| Communication | O(n) | O(n) | O(n²) |
-
-## Contributing
-
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## License
-
-MIT License - see [LICENSE](LICENSE) for details
-
-## Acknowledgments
-
-- Category Labs for MonadBFT research
-- HotStuff and PBFT foundational work
-- Global Settlement for settlement layer requirements
-
-## Citation
-
-If you use this toolkit in your research, please cite:
-
-```bibtex
-@misc{monadbft2025,
-  title={MonadBFT: Fast, Responsive, Fork-Resistant Streamlined Consensus},
-  author={Category Labs},
-  year={2025},
-  eprint={2502.20692},
-  archivePrefix={arXiv}
-}
+print(f"Average TPS: {results.avg_tps}")
+print(f"Peak TPS: {results.peak_tps}")
+print(f"Latency p50: {results.p50_latency}ms")
+print(f"Latency p99: {results.p99_latency}ms")
 ```
 
-## Contact
+## 🔍 Code Analysis
 
-For questions or collaboration:
-- GitHub Issues: [Create an issue](https://github.com/0xSoftBoi/monadbft-research-aggregator/issues)
-- Email: research@globalsettlement.io
+```python
+from src.analysis.code_analyzer import MonadBFTAnalyzer
+
+analyzer = MonadBFTAnalyzer()
+
+# Analyze implementation from GitHub
+analysis = analyzer.analyze_repository(
+    repo="category-labs/monad-bft",
+    branch="main"
+)
+
+print(f"Safety properties verified: {analysis.safety_verified}")
+print(f"Liveness properties verified: {analysis.liveness_verified}")
+print(f"Code coverage: {analysis.test_coverage}%")
+print(f"Performance score: {analysis.performance_score}/100")
+```
+
+## 📝 Documentation Generation
+
+```python
+from src.documentation.doc_generator import DocumentationGenerator
+
+gen = DocumentationGenerator()
+
+# Generate comprehensive research summary
+gen.generate_research_summary(
+    sources=["arxiv:2502.20692", "docs.monad.xyz"],
+    output="reports/monadbft_summary.md"
+)
+
+# Generate implementation guide
+gen.generate_implementation_guide(
+    language="rust",
+    output="reports/implementation_guide.md"
+)
+
+# Generate performance report
+gen.generate_performance_report(
+    benchmark_data="benchmarks/results.json",
+    output="reports/performance_report.pdf"
+)
+```
+
+## 🎓 Use Cases for Global Settlement
+
+### 1. Settlement Layer Design
+
+```python
+from src.implementations.settlement_layer import SettlementLayerSimulator
+
+# Simulate settlement with MonadBFT
+settlement = SettlementLayerSimulator(
+    validators=10,
+    finality_time=1.0,  # seconds
+    transaction_throughput=10000  # TPS
+)
+
+# Test settlement scenarios
+result = settlement.test_cross_chain_settlement(
+    chains=["ethereum", "bitcoin", "solana"],
+    volume=1000000  # transactions
+)
+
+print(f"Settlement time: {result.total_time}s")
+print(f"Failed transactions: {result.failures}")
+print(f"Finality guarantees: {result.finality_rate}%")
+```
+
+### 2. Fork Resistance Analysis
+
+```python
+from src.benchmarks.fork_resistance import ForkResistanceTest
+
+# Test resistance to various attack scenarios
+test = ForkResistanceTest()
+results = test.run_attack_scenarios([
+    "double_spend",
+    "selfish_mining",
+    "nothing_at_stake",
+    "long_range_attack"
+])
+
+for scenario, result in results.items():
+    print(f"{scenario}: {'RESISTANT' if result.passed else 'VULNERABLE'}")
+```
+
+### 3. Performance Comparison
+
+```python
+from src.benchmarks.consensus_benchmark import ConsensusComparison
+
+# Compare MonadBFT with other consensus protocols
+comparison = ConsensusComparison()
+results = comparison.compare_protocols([
+    "MonadBFT",
+    "HotStuff",
+    "Tendermint",
+    "Algorand"
+])
+
+comparison.plot_comparison(["latency", "throughput", "scalability"])
+```
+
+## 🔧 Configuration
+
+Edit `config/sources.yaml` to customize research sources:
+
+```yaml
+arxiv:
+  papers:
+    - "2502.20692"  # MonadBFT paper
+  search_terms:
+    - "MonadBFT"
+    - "streamlined consensus"
+    - "Byzantine fault tolerance"
+
+github:
+  repositories:
+    - "category-labs/monad-bft"
+    - "category-labs/monad"
+  organizations:
+    - "category-labs"
+
+blogs:
+  - url: "https://blog.monad.xyz"
+    selectors:
+      title: "h1.post-title"
+      content: "div.post-content"
+      date: "time.post-date"
+
+documentation:
+  - url: "https://docs.monad.xyz"
+    crawl_depth: 3
+    include_patterns:
+      - "/consensus/*"
+      - "/architecture/*"
+```
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+pytest tests/
+
+# Run specific test suites
+pytest tests/test_consensus.py
+pytest tests/test_benchmarks.py
+pytest tests/test_analysis.py
+
+# Run with coverage
+pytest --cov=src tests/
+```
+
+## 📊 Example Reports
+
+The tool generates various types of reports:
+
+1. **Research Summary**: Comprehensive overview of MonadBFT research
+2. **Performance Benchmarks**: Latency, throughput, and scalability metrics
+3. **Implementation Analysis**: Code quality and correctness verification
+4. **Security Audit**: Safety and liveness property verification
+5. **Comparison Reports**: MonadBFT vs. other consensus protocols
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Submit a pull request
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+## 🔗 Resources
+
+- [MonadBFT Paper (arXiv:2502.20692)](https://arxiv.org/abs/2502.20692)
+- [Monad Documentation](https://docs.monad.xyz)
+- [Category Labs Blog](https://blog.monad.xyz)
+- [monad-viz Demo](https://github.com/category-labs/monad-viz)
+- [HotStuff Paper](https://arxiv.org/abs/1803.05069)
+- [Fast-HotStuff Paper](https://arxiv.org/abs/2010.11454)
+
+## 📧 Contact
+
+Built for blockchain settlement research and Global Settlement architecture work.
+
+For questions or collaboration: [GitHub Issues](https://github.com/0xSoftBoi/monadbft-research-aggregator/issues)
 
 ---
 
-Built with ❤️ for blockchain settlement research
+**Note**: This toolkit is designed for research and educational purposes. Always conduct thorough security audits before deploying consensus protocols in production environments.
