@@ -5,10 +5,32 @@ Web scraper for documentation and blog posts.
 
 import asyncio
 import aiohttp
+import ipaddress
+import re
 from bs4 import BeautifulSoup
 from typing import List, Dict, Optional, Set
 from urllib.parse import urljoin, urlparse
 from loguru import logger
+
+ALLOWED_DOMAINS = {'monad.xyz', 'github.com', 'arxiv.org', 'x.com', 'twitter.com', 'medium.com', 'docs.monad.xyz'}
+
+def _validate_crawl_url(url: str) -> str:
+    parsed = urlparse(url)
+    if parsed.scheme not in ('https', 'http'):
+        raise ValueError(f"Invalid scheme: {parsed.scheme}")
+    host = parsed.hostname or ''
+    try:
+        addr = ipaddress.ip_address(host)
+        if addr.is_private or addr.is_loopback or addr.is_link_local:
+            raise ValueError(f"Private/internal IP not allowed: {host}")
+    except ValueError as e:
+        if 'Private' in str(e) or 'internal' in str(e):
+            raise
+        # It's a hostname — check against allowlist
+        domain = '.'.join(host.split('.')[-2:])  # get base domain
+        if domain not in ALLOWED_DOMAINS and host not in ALLOWED_DOMAINS:
+            raise ValueError(f"Domain not in allowlist: {host}")
+    return url
 
 
 class WebScraper:
@@ -89,6 +111,7 @@ class WebScraper:
         max_pages: int = 100
     ) -> List[Dict]:
         """Crawl website starting from URL."""
+        _validate_crawl_url(start_url)
         logger.info(f"Starting crawl from {start_url} with depth {depth}")
         
         pages = []
