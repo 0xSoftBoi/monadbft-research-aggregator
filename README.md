@@ -2,7 +2,7 @@
 
 <div align="center">
   <h3>Comprehensive Research & Implementation Toolkit for MonadBFT Consensus</h3>
-  <p>Built for blockchain settlement research and Global Settlement architecture work</p>
+  <p>Built for blockchain consensus & cross-chain settlement research.</p>
 </div>
 
 ## 🎯 Overview
@@ -291,7 +291,7 @@ gen.generate_performance_report(
 )
 ```
 
-## 🎓 Use Cases for Global Settlement
+## 🎓 Use Cases for Settlement Layers
 
 ### 1. Settlement Layer Design
 
@@ -435,7 +435,7 @@ MIT License - See LICENSE file for details
 
 ## 📧 Contact
 
-Built for blockchain settlement research and Global Settlement architecture work.
+Built for blockchain consensus & cross-chain settlement research.
 
 For questions or collaboration: [GitHub Issues](https://github.com/0xSoftBoi/monadbft-research-aggregator/issues)
 

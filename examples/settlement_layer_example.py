@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Global Settlement Layer Example
+Settlement Layer Example
 
 Demonstrates using MonadBFT for blockchain settlement applications.
-Relevant for Global Settlement's blockchain architecture work.
+Relevant to cross-chain settlement-layer architecture.
 """
 
 import asyncio
@@ -243,7 +243,7 @@ async def main():
     """Run all settlement layer demos."""
     console.clear()
     
-    console.print("\n[bold white]Global Settlement Layer with MonadBFT[/bold white]")
+    console.print("\n[bold white]Settlement Layer with MonadBFT[/bold white]")
     console.print("[cyan]Blockchain Settlement Architecture Demo[/cyan]\n")
     
     await demo_simple_settlement()

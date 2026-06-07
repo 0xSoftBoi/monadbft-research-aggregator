@@ -381,4 +381,4 @@ MIT License - See [LICENSE](LICENSE) file for details
 
 **Happy researching!** 🚀
 
-Built with ❤️ for blockchain settlement research and Global Settlement architecture work.
+Built with ❤️ for blockchain settlement research and cross-chain settlement architecture work.
